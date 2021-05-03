@@ -6,13 +6,15 @@ from flask import jsonify
 
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 
-@books_bp.route("/<book_id>", methods=["GET", "PUT", "DELETE"], strict_slashes=False)
+@books_bp.route("/<book_id>", methods=["GET", "PUT","DELETE"], strict_slashes=False)
 # this function get data from one book and also updates data.
 def handle_book(book_id):
     # Try to find the book with the given id
     book = Book.query.get(book_id)
 
     if request.method == "GET":
+        if book is None:
+            return make_response("", 404)
         return {
             "id": book.id,
             "title": book.title,
