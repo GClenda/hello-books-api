@@ -10,11 +10,14 @@ books_bp = Blueprint("books", __name__, url_prefix="/books")
 # this function get data from one book and also updates data.
 def handle_book(book_id):
     # Try to find the book with the given id
+
     book = Book.query.get(book_id)
 
+    if book is None:
+        return make_response("", 404)
+
     if request.method == "GET":
-        if book is None:
-            return make_response("", 404)
+        
         return {
             "id": book.id,
             "title": book.title,
@@ -46,7 +49,11 @@ def handle_book(book_id):
 @books_bp.route("", methods=["POST", "GET"], strict_slashes=False)
 def books():
     if request.method == "GET":
-        books = Book.query.all()
+        book_title = request.args.get("title")
+        if book_title != None:
+            books = Book.query.filter_by(title=book_title)
+        else:
+            books = Book.query.all()
         books_response = []
         for book in books:
             books_response.append({
@@ -55,6 +62,7 @@ def books():
                 "description": book.description
             })
         return jsonify(books_response)
+    
 
     else:
         request_body = request.get_json()
@@ -68,13 +76,13 @@ def books():
 
 
 
-hello_world_bp = Blueprint("hello_world", __name__)
+# hello_world_bp = Blueprint("hello_world", __name__)
 
 
-@hello_world_bp.route("/hello-world", methods=["GET"])
-def say_hello_world():
-    my_response_body = "Hello, World!"
-    return my_response_body
+# @hello_world_bp.route("/hello-world", methods=["GET"])
+# def say_hello_world():
+#     my_response_body = "Hello, World!"
+#     return my_response_body
 
 
 # @hello_world_bp.route("/hello/JSON", methods=["GET"])
